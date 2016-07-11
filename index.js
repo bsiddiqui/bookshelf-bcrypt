@@ -104,8 +104,11 @@ module.exports = (bookshelf, settings) => {
 
       // Configure bcrypt only for enabled models
       if (field) {
+        let initialize = child.prototype.initialize
+
         child.prototype.initialize = function () {
-          BookshelfModel.prototype.initialize.call(this)
+          // Do not override child's initialization
+          if (initialize) initialize.call(this)
 
           // Hash the password when saving
           this.on('saving', (model, attrs, options) => {
