@@ -135,6 +135,32 @@ lab.experiment('general tests', () => {
     expect(user.get('password').split('$')[2]).to.equal('05')
   }))
 
+  lab.test('should not override child\'s initialization', co.wrap(function * () {
+    let initialized = false
+    let bookshelf = require('bookshelf')(db.bookshelf.knex)
+    bookshelf.plugin(require('../../'), {
+      rounds: 5
+    })
+
+    let Model = bookshelf.Model.extend({
+      tableName: 'users',
+      bcrypt: { field: 'password' },
+      initialize () {
+        initialized = true
+      }
+    })
+
+    let user = yield Model.forge({
+      name: 'Hello World',
+      email: 'hello@world.com',
+      password: 'password'
+    })
+    .save()
+
+    expect(initialized).to.be.true()
+    expect(user.get('password').split('$')[2]).to.equal('05')
+  }))
+
   lab.test('should capture hash errors', co.wrap(function * () {
     let bookshelf = require('bookshelf')(db.bookshelf.knex)
     bookshelf.plugin(require('../../'), {
