@@ -97,8 +97,6 @@ module.exports = (bookshelf, settings) => {
   // Extends the default model class
   bookshelf.Model = bookshelf.Model.extend({}, {
     extended (child) {
-      BookshelfModel.extended.call(BookshelfModel.extended, child)
-
       // Check if the extended model has the bcrypt option
       let field = get(child.prototype, 'bcrypt.field')
 

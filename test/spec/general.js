@@ -161,6 +161,21 @@ lab.experiment('general tests', () => {
     expect(user.get('password').split('$')[2]).to.equal('05')
   }))
 
+  lab.test('should not call extended two times', co.wrap(function * () {
+    let bookshelf = require('bookshelf')(db.bookshelf.knex)
+    bookshelf.plugin(require('../../'))
+
+    let Model = bookshelf.Model.extend({
+      tableName: 'users'
+    })
+
+    let error = yield Model.forge({ email: 'wont@exists' })
+    .fetch({ require: true })
+    .catch(err => err)
+
+    expect(error).to.be.instanceof(bookshelf.Model.NotFoundError)
+  }))
+
   lab.test('should capture hash errors', co.wrap(function * () {
     let bookshelf = require('bookshelf')(db.bookshelf.knex)
     bookshelf.plugin(require('../../'), {
