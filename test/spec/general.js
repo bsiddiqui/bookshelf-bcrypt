@@ -222,5 +222,50 @@ lab.experiment('general tests', () => {
     expect(rehash).to.equal('Detected rehash on users')
     expect(user.get('password').split('$')).to.have.length(4)
   }))
-})
 
+  lab.test('should throw error if null password is detected', co.wrap(function * () {
+    yield User
+      .forge({
+        name: 'Hello World',
+        email: 'hello@world.com',
+        password: null
+      })
+      .save()
+      .catch((err) => {
+        expect(err).to.be.instanceof(User.EmptyPasswordDetected)
+      })
+  }))
+
+  lab.test('should throw error if undefined password is detected', co.wrap(function * () {
+    yield User
+      .forge({
+        name: 'Hello World',
+        email: 'hello@world.com',
+        password: undefined
+      })
+      .save()
+      .catch((err) => {
+        expect(err).to.be.instanceof(User.EmptyPasswordDetected)
+      })
+  }))
+
+  lab.test('should bypass plugin if field is empty and allowEmptyPassword option is true', co.wrap(function * () {
+    let bookshelf = require('bookshelf')(db.bookshelf.knex)
+    bookshelf.plugin(require('../../'))
+
+    let Model = bookshelf.Model.extend({
+      tableName: 'users',
+      bcrypt: { field: 'password', allowEmptyPassword: true }
+    })
+
+    let user = yield Model
+      .forge({
+        name: 'Hello World',
+        email: 'hello@world.com',
+        password: null
+      })
+      .save()
+
+    expect(user.get('password')).to.be.null()
+  }))
+})

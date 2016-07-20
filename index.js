@@ -12,6 +12,7 @@ module.exports = (bookshelf, settings) => {
 
   // Add default settings
   settings = merge({
+    allowEmptyPassword: false,
     rounds: RECOMMENDED_ROUNDS,
     onRehash: function () {
       throw new this.constructor.BcryptRehashDetected()
@@ -94,6 +95,17 @@ module.exports = (bookshelf, settings) => {
     }
   }
 
+  /**
+   * Custom error class for throwing when this plugin detects a null or undefined password
+   * @type {Error}
+   */
+  bookshelf.EmptyPasswordDetected = BookshelfModel.EmptyPasswordDetected = class extends Error {
+    constructor () {
+      super('Bcrypt cannot hash a null or undefined password')
+      this.name = 'EmptyPasswordDetected'
+    }
+  }
+
   // Extends the default model class
   bookshelf.Model = bookshelf.Model.extend({}, {
     extended (child) {
@@ -113,7 +125,13 @@ module.exports = (bookshelf, settings) => {
             let field = get(this, 'bcrypt.field')
 
             if (model.hasChanged(field) && options.bcrypt !== false) {
-              return hashAndStore(model.get(field), field, model)
+              let password = model.get(field)
+
+              if (password !== null && typeof password !== 'undefined') {
+                return hashAndStore(password, field, model)
+              } else if (this.bcrypt.allowEmptyPassword !== true) {
+                throw new this.constructor.EmptyPasswordDetected()
+              }
             }
           })
         }
@@ -131,4 +149,3 @@ module.exports = (bookshelf, settings) => {
     }
   })
 }
-
