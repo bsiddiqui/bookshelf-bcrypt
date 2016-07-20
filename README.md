@@ -21,6 +21,9 @@ bookshelf.plugin(require('bookshelf-bcrypt'))
 
 // Enable it on your models
 let User = bookshelf.Model.extend({ tableName: 'users', bcrypt: { field: 'password' } })
+
+// By default, an error will be thrown if a null/undefined password is detected. Use the following to allow null/undefined passwords
+let User = bookshelf.Model.extend({ tableName: 'users', bcrypt: { field: 'password', allowEmptyPassword: true } })
 ```
 
 ### Usage
