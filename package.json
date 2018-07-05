@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/estate/bookshelf-bcrypt#readme",
   "dependencies": {
-    "bcrypt": "^0.8.6",
+    "bcrypt": "^2.0.1",
     "lodash.get": "^4.3.0",
     "lodash.merge": "^4.4.0"
   },
