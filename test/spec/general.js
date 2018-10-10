@@ -3,7 +3,6 @@
 let co = require('co')
 let lab = exports.lab = require('lab').script()
 let expect = require('code').expect
-let bcrypt = require('bcrypt')
 
 let db = require('../db')
 let User = db.bookshelf.model('User')
@@ -61,44 +60,30 @@ lab.experiment('general tests', () => {
     expect(user.get('password')).to.equal('password')
   }))
 
-  lab.test('should throw when rehashing', co.wrap(function * () {
-    let user = yield User.forge({ email: 'Raina_Kunde14@hotmail.com' }).fetch()
+  lab.test('boom should throw when rehashing', co.wrap(function * () {
+    let bookshelf = require('bookshelf')(db.bookshelf.knex)
+    bookshelf.plugin(require('../../'), {
+      detectBcrypt: password => password.length > 10
+    })
 
-    let error = yield user.save('password', bcrypt.hashSync('password', 12))
-    .catch((err) => err)
+    let Model = bookshelf.Model.extend({
+      tableName: 'users',
+      bcrypt: { field: 'password' }
+    })
 
-    expect(error).to.be.instanceof(User.BcryptRehashDetected)
-  }))
+    let user = yield Model.forge({
+      name: 'Hello World',
+      email: 'hello@world.com',
+      password: '123'
+    })
+    .save()
 
-  lab.test('should correctly detect rehash', co.wrap(function * () {
-    let user = yield User.forge({ email: 'Raina_Kunde14@hotmail.com' }).fetch()
-    let hash = bcrypt.hashSync('password', 12)
-    let error
+    expect(user.get('password').split('$')).to.have.length(4)
 
-    error = yield user.save('password', `abc${hash}`)
-    .catch((err) => err)
-
-    expect(error).to.not.be.instanceof(User.BcryptRehashDetected)
-
-    error = yield user.save('password', hash.replace('$2a$', '$2b$'))
-    .catch((err) => err)
-
-    expect(error).to.be.instanceof(User.BcryptRehashDetected)
-
-    error = yield user.save('password', hash.replace('$2a$', '$2y$'))
-    .catch((err) => err)
-
-    expect(error).to.be.instanceof(User.BcryptRehashDetected)
-
-    error = yield user.save('password', hash.replace('$2a$', '$nn$'))
-    .catch((err) => err)
-
-    expect(error).to.not.be.instanceof(User.BcryptRehashDetected)
-
-    error = yield user.save('password', hash.replace('$12$', '$nn$'))
-    .catch((err) => err)
-
-    expect(error).to.not.be.instanceof(User.BcryptRehashDetected)
+    yield user.save('password', '12345678910')
+      .catch((err) => {
+        expect(err).to.be.instanceof(Model.BcryptRehashDetected)
+      })
   }))
 
   lab.test('should not bootstrap on unconfigured models', co.wrap(function * () {
@@ -204,7 +189,8 @@ lab.experiment('general tests', () => {
     bookshelf.plugin(require('../../'), {
       onRehash: function () {
         rehash = `Detected rehash on ${this.tableName}`
-      }
+      },
+      detectBcrypt: password => password.length > 10
     })
 
     let Model = bookshelf.Model.extend({
@@ -215,7 +201,7 @@ lab.experiment('general tests', () => {
     let user = yield Model.forge({
       name: 'Hello World',
       email: 'hello@world.com',
-      password: bcrypt.hashSync('password', 12)
+      password: '12345678910'
     })
     .save()
 

@@ -52,13 +52,15 @@ yield user.save({ bcrypt: false })
 
 ### Settings
 
-`bookshelf-bcrypt` uses 12 salt rounds by default and throws an error when it
-detect a rehash of a bcrypt hash. You can change this behavior when adding
-the plugin to bookshelf
+`bookshelf-bcrypt` uses 12 salt rounds by default. By default we don't try and detect
+a rehash because a user may use a password that looks like a bcrypt hash. If you
+add a detectBcrypt function value and it returns a truthy value, an error will be thrown.
+You can also override the onRehash function in settings.
 
 ```javascript
 bookshelf.plugin(require('bookshelf-bcrypt'), {
   rounds: 10 // >= 12 recommended though,
+  detectBcrypt: password => password.length > 50,
   onRehash: function () {
     // This will avoid throwing error but be aware that you can loose
     // user's password if you don't know what you're doing.

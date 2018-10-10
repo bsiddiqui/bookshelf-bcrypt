@@ -14,26 +14,11 @@ module.exports = (bookshelf, settings) => {
   settings = merge({
     allowEmptyPassword: false,
     rounds: RECOMMENDED_ROUNDS,
+    detectBcrypt: () => false,
     onRehash: function () {
       throw new this.constructor.BcryptRehashDetected()
     }
   }, settings)
-
-  /**
-   * Detect rehashing for avoiding undesired effects
-   * @param {String} str A string to be checked
-   * @return {Boolean} True if the str seems to be a bcrypt hash
-   */
-  function detectBcrypt (str) {
-    let protocol = str.split('$')
-
-    // Ex $2a$12$K2CtDP7zSGOKgjXjxD9SYey9mSZ9Udio9C95K6wCKZewSP9oBWyPO
-    return protocol.length === 4 &&
-      protocol[0] === '' &&
-      ['2a', '2b', '2y'].indexOf(protocol[1]) > -1 &&
-      /^\d+$/.test(protocol[2]) &&
-      protocol[3].length === 53
-  }
 
   /**
    * Hashes a string and stores it inside the provided model
@@ -47,7 +32,7 @@ module.exports = (bookshelf, settings) => {
     return new Promise(function (resolve, reject) {
       // Avoid rehashing a string by mistake but allow users to implement
       // non throwing logic
-      if (detectBcrypt(string) && typeof settings.onRehash === 'function') {
+      if (settings.detectBcrypt(string) && typeof settings.onRehash === 'function') {
         try {
           settings.onRehash.call(model)
         } catch (err) {
