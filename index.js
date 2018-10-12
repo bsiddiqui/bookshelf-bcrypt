@@ -44,7 +44,7 @@ module.exports = (bookshelf, settings) => {
         if (err) return reject(err)
 
         // Set the field and resolves the promise
-        model.save(field, hash)
+        model.set(field, hash)
         resolve(model)
       })
     })
