@@ -1,7 +1,7 @@
 'use strict'
 
-exports.seed = (knex, Promise) => {
-  let users = [
+exports.seed = async function (knex) {
+  const users = [
     {
       name: 'Amira Dooley',
       email: 'Raina_Kunde14@hotmail.com',
@@ -24,8 +24,6 @@ exports.seed = (knex, Promise) => {
       updated_at: new Date()
     }
   ]
-  return Promise.join(
-    knex('users').del(),
-    knex('users').insert(users)
-  )
+  await knex('users').del()
+  return knex('users').insert(users)
 }

@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-bcrypt",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Automatic password hashing for your bookshelf models",
   "main": "index.js",
   "scripts": {
@@ -34,17 +34,17 @@
   },
   "homepage": "https://github.com/estate/bookshelf-bcrypt#readme",
   "dependencies": {
-    "bcrypt": "^3.0.1",
+    "bcrypt": "^5.0.0",
     "lodash.get": "^4.3.0",
-    "lodash.merge": "^4.4.0",
+    "lodash.merge": "^4.6.2",
     "sqlite3": "^4.0.2"
   },
   "devDependencies": {
     "bookshelf": "^0.13.3",
     "co": "^4.6.0",
     "code": "^2.2.0",
-    "knex": "^0.15.2",
-    "lab": "^10.3.1",
-    "standard": "^7.0.1"
+    "knex": "^0.21.5",
+    "@hapi/lab": "23.0.0",
+    "standard": "^14.3.4"
   }
 }
