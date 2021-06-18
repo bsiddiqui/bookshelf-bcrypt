@@ -1,14 +1,14 @@
 'use strict'
 
-let merge = require('lodash.merge')
-let get = require('lodash.get')
-let bcrypt = require('bcrypt')
+const merge = require('lodash.merge')
+const get = require('lodash.get')
+const bcrypt = require('bcrypt')
 
 // https://paragonie.com/blog/2016/02/how-safely-store-password-in-2016
 const RECOMMENDED_ROUNDS = 12
 
 module.exports = (bookshelf, settings) => {
-  let BookshelfModel = bookshelf.Model
+  const BookshelfModel = bookshelf.Model
 
   // Add default settings
   settings = merge({
@@ -95,11 +95,11 @@ module.exports = (bookshelf, settings) => {
   bookshelf.Model = bookshelf.Model.extend({}, {
     extended (child) {
       // Check if the extended model has the bcrypt option
-      let field = get(child.prototype, 'bcrypt.field')
+      const field = get(child.prototype, 'bcrypt.field')
 
       // Configure bcrypt only for enabled models
       if (field) {
-        let initialize = child.prototype.initialize
+        const initialize = child.prototype.initialize
 
         child.prototype.initialize = function () {
           // Do not override child's initialization
@@ -107,10 +107,10 @@ module.exports = (bookshelf, settings) => {
 
           // Hash the password when saving
           this.on('saving', (model, attrs, options) => {
-            let field = get(this, 'bcrypt.field')
+            const field = get(this, 'bcrypt.field')
 
             if (model.hasChanged(field) && options.bcrypt !== false) {
-              let password = model.get(field)
+              const password = model.get(field)
 
               if (password !== null && typeof password !== 'undefined') {
                 return hashAndStore(password, field, model)

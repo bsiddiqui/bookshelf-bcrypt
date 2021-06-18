@@ -1,15 +1,17 @@
 'use strict'
 
+const path = require('path')
+
 exports.development = {
   client: 'sqlite3',
   connection: {
-    filename: `${__dirname}/db.sqlite`
+    filename: path.join(__dirname, 'db.sqlite')
   },
   useNullAsDefault: true,
   migrations: {
-    directory: `${__dirname}/migrations`
+    directory: path.join(__dirname, 'migrations')
   },
   seeds: {
-    directory: `${__dirname}/seeds`
+    directory: path.join(__dirname, 'seeds')
   }
 }

@@ -1,0 +1,31 @@
+orbs:
+  node: circleci/node@4.2.1
+
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:12.21
+        environment:
+          NODE_ENV: test
+    steps:
+      - checkout
+      - node/install-packages
+      - run: 
+          name: Run test
+          command: npm run test-cov
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            # download test reporter as a static binary
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
+          name: Send Code Climate report
+          command: ./cc-test-reporter after-build coverage/lcov.info
+
+workflows:
+  app-tests:
+    jobs:
+      - test
