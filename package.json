@@ -35,16 +35,16 @@
   "homepage": "https://github.com/estate/bookshelf-bcrypt#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
-    "lodash.get": "^4.3.0",
-    "lodash.merge": "^4.4.0"
+    "lodash.get": "^4.4.2",
+    "lodash.merge": "^4.6.2"
   },
   "devDependencies": {
-    "bookshelf": "^0.13.3",
+    "@hapi/lab": "^24.3.2",
+    "bookshelf": "^1.2.0",
     "co": "^4.6.0",
     "code": "^2.2.0",
-    "knex": "^0.15.2",
-    "lab": "^10.3.1",
+    "knex": "^0.21.19",
     "sqlite3": "^5.0.2",
-    "standard": "^7.0.1"
+    "standard": "^16.0.3"
   }
 }
