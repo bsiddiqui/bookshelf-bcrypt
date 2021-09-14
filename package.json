@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-bcrypt",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Automatic password hashing for your bookshelf models",
   "main": "index.js",
   "scripts": {
